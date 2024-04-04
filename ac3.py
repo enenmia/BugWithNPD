@@ -72,6 +72,7 @@ def main():
                                 print(f"Recognized: {conversation_string}")
                                 gpt_response = generate_response_with_gpt3(conversation_string, "your-api-key")  
                                 print(gpt_response)
+                                speak_text(gpt_response)
                                 break
                         except sr.UnknownValueError:
                             continue
