@@ -4,6 +4,10 @@ import speech_recognition as sr
 import time
 import random
 import threading
+pip install gTTS 
+
+# for connection with arduino
+ser = serial.Serial('/dev/ttyUSB0', 9600) # make sure to update the device according to the port
 
 # 预定义的中断句子
 interrupt_sentences = ["enheng", "yes", "ok", "well"]
@@ -26,6 +30,13 @@ def generate_response_with_gpt3(text, api_key):
     except Exception as e:
         print(f"Error in generating response: {e}")
         return "I'm sorry, I couldn't generate a response."
+
+def speak_text(text):
+    language = 'en'
+    myobj = gTTS(text=text, lang=language, slow=False)
+    myobj.save("temp.mp3")
+    os.system("afplay temp.mp3") # change afplay into desired laptop system
+    os.remove("temp.mp3")
 
 def interrupter(stop_listening):
     while not stop_listening.is_set():
