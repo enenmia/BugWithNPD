@@ -1,4 +1,5 @@
 #pip install gTTS 
+# pip install pyaudio
 
 from openai import OpenAI
 import os
@@ -46,6 +47,7 @@ def interrupter(stop_listening):
         print(random.choice(interrupt_sentences))
 
 def main():
+    speak_text("Are you ok? If not, remember I am always here for help")
     print("Are you ok? If not, remember I am always here for help")
     recognizer = sr.Recognizer()
     with sr.Microphone() as source:
