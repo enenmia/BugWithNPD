@@ -1,10 +1,12 @@
+#pip install gTTS 
+
 from openai import OpenAI
 import os
 import speech_recognition as sr
 import time
 import random
 import threading
-#pip install gTTS 
+from gtts import gTTS
 
 # for connection with arduino
 ser = serial.Serial('/dev/ttyUSB0', 9600) # make sure to update the device according to the port
