@@ -20,9 +20,9 @@ void loop() {
     char command = Serial.read();
     switch (command) {
       case 'y': // 控制黄色 LED 闪烁
-        yellowLedState = !yellowLedState; // 切换 LED 状态
-        digitalWrite(yellowLedPin, yellowLedState ? HIGH : LOW);
-        delay(500); // 闪烁延时
+        digitalWrite(redLedPin, LOW);
+        digitalWrite(greenLedPin, LOW);
+        digitalWrite(yellowLedPin, HIGH);
         break;
       case 'g': // 控制绿色 LED
         digitalWrite(redLedPin, HIGH);

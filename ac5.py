@@ -9,7 +9,7 @@ from openai import OpenAI
 
 interrupt_sentences = ["enheng", "yes", "ok", "well"]
 
-arduino_port = '/dev/cu.usbserial-1110'  # Change this to the arduino port, sometimes 1100 sometimes 110
+arduino_port = '/dev/cu.usbserial-1120'  # Change this to the arduino port, sometimes 1100 sometimes 110
 baud_rate = 9600
 ser = serial.Serial(arduino_port, baud_rate, timeout=1)
 ser_lock = threading.Lock()
@@ -18,8 +18,13 @@ ser_lock = threading.Lock()
 def write_to_serial(message):
     with ser_lock:
         ser.write(message)
+# def write_to_serial_and_print(message):
+#     print(message)
+#     for char in message:
+#         ser.write(char.encode())
+#         time.sleep(0.01)  # Small delay between characters
+#     ser.write('\n'.encode())  # Send a newline character as the end of the message
 
-# 修改所有 ser.write 的调用
 
 
 def generate_response_with_gpt3(text, api_key):
@@ -54,42 +59,42 @@ def speak_text(text):
 
 
 def interrupter(stop_listening):
+    last_time_spoken = time.time()
     while not stop_listening.is_set():
-        time.sleep(4) 
-        sentence_to_speak = random.choice(interrupt_sentences)
-        print(sentence_to_speak)
-        speak_text(sentence_to_speak) 
-
-
+        current_time = time.time()
+        # Check if 4 seconds have passed since the last interruption
+        if current_time - last_time_spoken >= 4:
+            sentence_to_speak = random.choice(interrupt_sentences)
+            print(sentence_to_speak)
+            speak_text(sentence_to_speak)
+            last_time_spoken = current_time
+        time.sleep(0.1)  # Short sleep for responsive stopping
 def main():
-    
+    write_to_serial(b'y')
+    # write_to_serial_and_print("Are you ok? If not, remember I am always here for help")
     speak_text("Are you ok? If not, remember I am always here for help")
     print("Are you ok? If not, remember I am always here for help")
     recognizer = sr.Recognizer()
     with sr.Microphone() as source:
         recognizer.adjust_for_ambient_noise(source)
         while True:
-            audio = recognizer.listen(source)
-            
             try:
+                print("Listening for 'hello'...")
+                # write_to_serial_and_print("Listening for 'hello'...")
+                audio = recognizer.listen(source, timeout=5)  # Adjust the timeout as needed
                 recognized_text = recognizer.recognize_google(audio)
                 if "hello" in recognized_text.lower():
+                    # write_to_serial_and_print("Hello recognized. Listening for speech...")
                     print("Hello recognized. Listening for speech...")
-                    # time.sleep(4)
+                    
                     stop_listening = threading.Event()
                     interrupt_thread = threading.Thread(target=interrupter, args=(stop_listening,))
                     interrupt_thread.start()
                     conversation = []
 
-            
-                
-
                     while True:
-                        
-                        
-                        
-                        audio = recognizer.listen(source)
                         try:
+                            audio = recognizer.listen(source, timeout=5)  # Adjust the timeout as needed
                             recognized_text = recognizer.recognize_google(audio)
                             conversation.append(recognized_text)
 
@@ -97,13 +102,14 @@ def main():
                                 stop_listening.set()
                                 conversation_string = " ".join(conversation).replace("do you have any suggestion", "").strip()
                                 print(f"Recognized: {conversation_string}")
+                                # write_to_serial_and_print(f"Recognized: {conversation_string}")
 
-
-                                gpt_response = generate_response_with_gpt3(conversation_string, "your-api-key")
+                                gpt_response = generate_response_with_gpt3(conversation_string, "apikey")
                                 print(gpt_response)
+                                # write_to_serial_and_print(gpt_response)
                                 write_to_serial(b'g')
                                 speak_text(gpt_response)
-                                
+                                time.sleep(5)
 
                                 break
                         except sr.UnknownValueError:
@@ -118,4 +124,5 @@ def main():
                 print(f"Could not request results from Google Speech Recognition service; {e}")
 
 if __name__ == "__main__":
-    main()
+    while True:
+        main()
