@@ -7,7 +7,7 @@ import random
 import speech_recognition as sr
 from openai import OpenAI
 
-interrupt_sentences = ["enheng", "yes", "ok", "well"]
+interrupt_sentences = ["hmm", "yes", "ok", "well"]
 
 arduino_port = '/dev/cu.usbserial-1120'  # Change this to the arduino port, sometimes 1100 sometimes 110
 baud_rate = 9600
@@ -33,7 +33,7 @@ def generate_response_with_gpt3(text, api_key):
     try:
         chat_completion = client.chat.completions.create(
             messages=[
-                {"role": "system", "content": "You are a friend of mine with Narcissistic personality disorder, which means you have a pattern of grandiosity, are in need for admiration, and lack of empathy. Pretend to be such a person and give a reaction to what the user just said. Limit your answer within 2 sentences and remember to showcase your NPD syndrome. Say it in first person perspective.Don't show too obciously your NPD nature. Express it in a more subtle way and use some passive-aggresiveness.Also talk about yourself."},
+                {"role": "system", "content": "You are a friend of mine with Toxic personality disorder, which means you have a pattern of grandiosity, are in need for admiration, and lack of empathy. Pretend to be such a person and give a reaction to what the user just said. Limit your answer within 2 sentences and remember to showcase your toxic personality. Say it in first person perspective.Don't show too obciously your nature. Express it in a more subtle way and use some passive-aggresiveness.Also talk about yourself."},
                 {"role": "user", "content": text}
             ],
             model="gpt-3.5-turbo",
@@ -70,6 +70,8 @@ def interrupter(stop_listening):
             last_time_spoken = current_time
         time.sleep(0.1)  # Short sleep for responsive stopping
 def main():
+recognized_hello = False
+while not recognized_hello:
     write_to_serial(b'y')
     # write_to_serial_and_print("Are you ok? If not, remember I am always here for help")
     speak_text("Are you ok? If not, remember I am always here for help")
